@@ -1,0 +1,16 @@
+accelerator:
+  displayName: Sample Tensorflow Accelerator
+  description: Sample app for building a deep learning model using Keras/Tensorflow
+  iconUrl: https://www.vectorlogo.zone/logos/tensorflow/tensorflow-icon.svg
+  tags:
+  - "ML"
+  - "AI"
+  - "machinelearning"
+  - "datascience"
+  - "MLOps"
+  - "artificialintelligence"
+  - "python"
+  - "mlflow"
+  - "keras"
+  - "tensorflow"
+  - "deeplearning"
