@@ -1,6 +1,6 @@
 import streamlit as st
 from PIL import Image
-from app.analytics import config, cifar_cnn
+from app.analytics import config, cifar_cnn, cifar_cnn_greenplum
 from streamlit_autorefresh import st_autorefresh
 import logging
 
@@ -57,7 +57,7 @@ with tab1:
             placeholder = st.empty()
             placeholder.header("Loading model...")
             with placeholder.container():
-                prediction = cifar_cnn.predict(cifar_img, config.model_name, config.model_stage)
+                prediction = cifar_cnn_greenplum.predict(cifar_img, config.model_name, config.model_stage)
                 if prediction:
                     st.markdown(f"Predicted Label:<br/> <span class='predictedlabel'>{prediction}</span>",
                                 unsafe_allow_html=True)
