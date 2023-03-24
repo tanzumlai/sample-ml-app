@@ -14,7 +14,7 @@ scipy
 plotly
 watchdog
 mpld3
-streamlit==1.12.0 # streamlit==1.11.1
+streamlit==1.18.0
 Pillow
 streamlit-autorefresh
 jupyterflow
@@ -43,5 +43,4 @@ pysqlite3-binary
 kfp==1.8.19
 python-multipart
 pyservicebinding
-greenplum-python
 .
