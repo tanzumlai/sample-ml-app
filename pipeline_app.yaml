@@ -1,0 +1,19 @@
+apiVersion: kappctrl.k14s.io/v1alpha1
+kind: App
+metadata:
+  name: mlapp-main-tanzu-mlops-w01-s019
+spec:
+  serviceAccountName: default
+  fetch:
+    - git:
+        url: https://github.com/tanzumlai/sample-ml-app
+        ref: origin/main-tanzu-mlops-w01-s019
+
+  template:
+    - ytt:
+        paths:
+          - pipeline.yaml
+          - values.yaml
+
+  deploy:
+    - kapp: {}
