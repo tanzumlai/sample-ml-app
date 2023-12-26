@@ -4,7 +4,7 @@ entry_points:
   upload_dataset:
     parameters:
         dataset-name: {default: "cifar10"}
-    command: 'python -c "`cat scripts/upload_dataset.py`"'
+    command: 'python upload_dataset.py "{dataset-name}"'
   train_model:
     parameters:
         dataset-name: {default: "cifar10"}
@@ -12,17 +12,17 @@ entry_points:
         model-flavor: {default: "tensorflow"}
         model-stage: {default: "None"}
         epochs: {type: float, default: 10}
-    command: 'python -c "`cat scripts/train_model.py`"'
+    command: 'python train_model.py "{dataset-name}" "{model-name}" "{model-flavor}" "{model-stage}" {epochs}'
   evaluate_model:
     parameters:
         dataset-name: {default: "cifar10"}
         model-name: {default: "cifar_cnn_a_demo"}
         model-flavor: {default: "tensorflow"}
-    command: 'python -c "`cat scripts/evaluate_model.py`"'
+    command: 'python evaluate_model.py "{model-name}" "{model-flavor}"'
   promote_model_to_staging:
     parameters:
         base_model-name: {default: "cifar_cnn"}
         candidate-model-name: {default: "cifar_cnn_a_demo"}
         dataset-name: {default: "cifar10"}
         model-flavor: {default: "tensorflow"}
-    command: 'python -c "`cat scripts/promote_model_to_staging.py`"'
+    command: 'python promote_model_to_staging.py "{base_model-name}" "{candidate-model-name}" "{dataset-name}" "{model-flavor}"'
