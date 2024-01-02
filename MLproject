@@ -11,7 +11,7 @@ entry_points:
         model-name: {default: "cifar_cnn_gpmain_demo"}
         model-flavor: {default: "tensorflow"}
         model-stage: {default: "None"}
-        epochs: {type: float, default: 10}
+        epochs: {type: float, default: 11}
     command: '$(which python3.9) train_model.py "{dataset-name}" "{model-name}" "{model-flavor}" "{model-stage}" {epochs} >> /tmp/app.log 2>&1'
   evaluate_model:
     parameters:
