@@ -8,7 +8,7 @@ environment_name: gp-main-tanzu-mlops-w04-s006
 script_shared_path: /liquibase/changelog
 mlpipeline_git_repo: https://github.com/agapebondservant/ml-image-processing-app-argopipeline-step.git
 pyfunction_vendored_dependencies_uri: https://tolatest-temp-resources.s3.us-east-2.amazonaws.com/vendor.tar.gz
-mlflow_s3_uri: http://minio-tanzu-mlops-w04-s006.tanzumlai.com
+mlflow_s3_uri: http://minio-ml.tanzumlai.com
 
 training_shared_path: /usr/local/greenplum-db/bin/plcontainer_clients
 training_db_script: plpython/sql/deploy_db_training.sql
@@ -25,7 +25,7 @@ training_image: kroniak/ssh-client
 inference_user: pgadmin
 inference_host: 35.196.205.137
 inference_db_name: pginstance-inference
-mlflow_tracking_uri: http://mlflow-tanzu-mlops-w04-s006.tanzumlai.com
+mlflow_tracking_uri: http://mlflow.tanzumlai.com
 inference_shared_path: /usr/local
 inference_db_script: plpython/sql/deploy_db_inference.sql
 inference_code_shell_script: plpython/shell/deploy_python_inference_code.sh
