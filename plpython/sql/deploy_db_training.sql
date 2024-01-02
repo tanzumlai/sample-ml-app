@@ -37,10 +37,10 @@ AS $$
             del sys.modules['base_app']
         sys.modules['importlib_metadata'] = importlib.metadata
 
-        from base_app import base_app_main
-        -- result = subprocess.run([sys.executable, f"{app_location}/base_app/base_app_main.py"], capture_output=True, text=True, env=os.environ.copy())
-        -- plpy.info("stdout: ", result.stdout)
-        -- plpy.info("stderr: ", result.stderr)
+        -- from base_app import base_app_main
+        result = subprocess.run([sys.executable, f"{app_location}/base_app/base_app_main.py"], capture_output=True, text=True, env=os.environ.copy())
+        plpy.info("stdout: ", result.stdout)
+        plpy.info("stderr: ", result.stderr)
 
         return subprocess.check_output('ls -ltr /', shell=True).decode(sys.stdout.encoding).strip()
     except subprocess.CalledProcessError as e:
