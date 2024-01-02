@@ -17,7 +17,7 @@ AS $$
     import logging
     logging.getLogger().addHandler(logging.StreamHandler())
     logging.getLogger().addHandler(logging.FileHandler(f"{app_location}/debug.log"))
-    -- import importlib
+    import importlib.metadata
     -- import pkgutil
     try:
         os.environ['MLFLOW_TRACKING_URI']=mlflow_host
@@ -28,18 +28,19 @@ AS $$
         os.environ['environment_name']=environment_name
         os.environ['experiment_name']=experiment_name
         os.environ['shared_app_path']=app_location
-        os.environ['PYTHONPATH']=f'{os.getenv("PYTHONPATH")}:{os.getenv("PATH")}:{app_location}/_vendor:{app_location}'
+        os.environ['PYTHONPATH']=f'{app_location}/_vendor:{app_location}:{os.getenv("PYTHONPATH")}:{os.getenv("PATH")}'
         sys.path.append(f'{app_location}/_vendor')
         sys.path.append(f'{app_location}')
         if sys.modules.get('base_app.base_app_main'):
             del sys.modules['base_app.base_app_main']
         if sys.modules.get('base_app'):
             del sys.modules['base_app']
+        sys.modules['importlib_metadata'] = importlib.metadata
 
-        -- from base_app import base_app_main
-        result = subprocess.run([sys.executable, f"{app_location}/base_app/base_app_main.py"], capture_output=True, text=True, env=os.environ.copy())
-        plpy.info("stdout: ", result.stdout)
-        plpy.info("stderr: ", result.stderr)
+        from base_app import base_app_main
+        -- result = subprocess.run([sys.executable, f"{app_location}/base_app/base_app_main.py"], capture_output=True, text=True, env=os.environ.copy())
+        -- plpy.info("stdout: ", result.stdout)
+        -- plpy.info("stderr: ", result.stderr)
 
         return subprocess.check_output('ls -ltr /', shell=True).decode(sys.stdout.encoding).strip()
     except subprocess.CalledProcessError as e:
