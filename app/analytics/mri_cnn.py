@@ -42,6 +42,9 @@ from mlflow.models import MetricThreshold
 from app.analytics import mlflow_utils
 from evidently.test_suite import TestSuite
 from evidently.test_preset import MulticlassClassificationTestPreset
+import tensorflow as tf
+import numpy as np
+from download_and_extract import Fetcher
 
 
 # ## Upload dataset
@@ -57,9 +60,31 @@ def upload_dataset(dataset, dataset_url=None, to_parquet=False):
         logging.info(f'Artifact run id is {artifact_run_id}')
 
         client = MlflowClient()
+        fetcher = Fetcher()
+        fetcher.fetch(url=dataset_url, path='data')
 
-        mod = importlib.import_module(f'tensorflow.keras.datasets.{dataset}')
-        (training_data, training_labels), (test_data, test_labels) = mod.load_data()
+        train_ds = tf.keras.utils.image_dataset_from_directory(
+            'data/data/Training',
+            label_mode='binary',
+            shuffle=False,
+            seed=123,
+            image_size=(32, 32),
+            batch_size=4)
+        train_ds = train_ds.unbatch()
+        training_data = np.asarray(list(train_ds.map(lambda x, y: x)))
+        training_labels = np.asarray(list(train_ds.map(lambda x, y: y)))
+
+        test_ds = tf.keras.utils.image_dataset_from_directory(
+            'data/data/Testing',
+            label_mode='binary',
+            shuffle=False,
+            seed=123,
+            image_size=(32, 32),
+            batch_size=4)
+        test_ds = test_ds.unbatch()
+        test_data = np.asarray(list(test_ds.map(lambda x, y: x)))
+        test_labels = np.asarray(list(test_ds.map(lambda x, y: y)))
+
         training_data, test_data = training_data / 255.0, test_data / 255.0
 
         hkl.dump({'training_data': training_data,
@@ -103,7 +128,7 @@ def download_dataset(artifact):
 
 
 def download_model(model_name, model_flavor, best_run_id=None, retries=2):
-    model, version, current_stage = None, 0, 'None'
+    model, version = None, 0
     with mlflow.start_run(run_name='download_model', nested=True) as active_run:
         mlflow_utils.prep_mlflow_run(active_run)
         try:
@@ -115,7 +140,6 @@ def download_model(model_name, model_flavor, best_run_id=None, retries=2):
             logging.info(f"In download model...search model results = {versions}")
             if len(versions):
                 version = versions[0].version
-                current_stage = versions[0].current_stage
                 model = getattr(mlflow, model_flavor).load_model(f'models:/{model_name}/{version}')
             else:
                 logging.info(f"No model found for {model_name}...")
@@ -126,7 +150,7 @@ def download_model(model_name, model_flavor, best_run_id=None, retries=2):
                 download_model(model_name, model_flavor, best_run_id=best_run_id, retries=retries - 1)
             else:
                 logging.error(f'Could not complete download for model {model_name} - error occurred: ', exc_info=True)
-        return model, version, current_stage
+        return model, version
 
 
 # ## Train Model
@@ -161,8 +185,8 @@ def train_model(model_name, model_flavor, model_stage, data, epochs=10):
         plt.xlabel('Epoch')
         plt.ylabel('Accuracy')
         plt.ylim([0.5, 1])
-        plt.savefig("cifar_cnn_accuracy.png", bbox_inches='tight')
-        client.log_artifact(artifact_run_id, "cifar_cnn_accuracy.png")
+        plt.savefig("mri_cnn_accuracy.png", bbox_inches='tight')
+        client.log_artifact(artifact_run_id, "mri_cnn_accuracy.png")
 
         # Log Metrics
         test_loss, test_acc = model.evaluate(data.get('test_data'), data.get('test_labels'), verbose=2)
@@ -170,9 +194,6 @@ def train_model(model_name, model_flavor, model_stage, data, epochs=10):
         client.log_metric(artifact_run_id, 'testing_accuracy', test_acc)
         client.log_metric(artifact_run_id, 'epochs', epochs)
         getattr(mlflow, model_flavor).autolog(log_models=False)
-
-        # Log Explainability
-        # mlflow.shap.log_explanation(model.predict, data.get('training_data').reshape(1, -1))
 
         # Register model
         getattr(mlflow, model_flavor).log_model(model,
@@ -196,7 +217,8 @@ def evaluate_model(model_name, model_flavor):
         best_run_id = best_runs[0].info.run_id if len(best_runs) else None
 
         if best_run_id is not None:
-            (model, version, model_stage) = download_model(model_name, model_flavor, best_run_id=best_run_id)
+            (model, version) = download_model(model_name, model_flavor, best_run_id=best_run_id)
+            model_stage = version.current_stage if version else 'None'
             logging.info(f"Found best model for experiments {experiment_name}, model name {model_name} : {model}, stage={model_stage}")
             if model_stage.lower() != 'production':
                 MlflowClient().transition_model_version_stage(
@@ -221,8 +243,8 @@ def promote_model_to_staging(base_model_name, candidate_model_name, evaluation_d
 
         _data_path = download_dataset(evaluation_dataset_name)
         _data = hkl.load(_data_path)
-        (candidate_model, candidate_model_version, _) = download_model(candidate_model_name, model_flavor, retries=6)
-        (base_model, base_model_version, _) = download_model(base_model_name, model_flavor, retries=6)
+        (candidate_model, candidate_model_version) = download_model(candidate_model_name, model_flavor, retries=6)
+        (base_model, base_model_version) = download_model(base_model_name, model_flavor, retries=6)
         test_data = _data.get('test_data')
         test_labels = _data.get('test_labels')
         preexisting_base_model_found = base_model is not None
@@ -234,7 +256,7 @@ def promote_model_to_staging(base_model_name, candidate_model_name, evaluation_d
             size, num_classes = test_labels.shape[0], 10
             dummy_data = pd.DataFrame({'x': np.random.randint(0, num_classes, size),
                                        'y': test_labels.reshape(size, )})
-            base_model = DummyClassifier(strategy='constant', constant='dog').fit(dummy_data['x'], dummy_data['y'])
+            base_model = DummyClassifier().fit(dummy_data['x'], dummy_data['y'])
 
         # Generate and Save Evaluation Metrics
         curr_data = _tensors_to_1d_prediction_and_target(test_data, test_labels, candidate_model)
@@ -259,9 +281,9 @@ def promote_model_to_staging(base_model_name, candidate_model_name, evaluation_d
         accuracy_results = np.array([test for test in tests_results_json_tests if test['name'] == 'Accuracy Score'])
         logging.info(f"Results...f1 = ${f1_accuracy_results}, accuracy = ${accuracy_results}")
         if len(f1_accuracy_results):
-            client.log_metric(artifact_run_id, 'f1_score', f1_accuracy_results[0]['parameters']['value'])
+            client.log_metric(artifact_run_id, 'f1_score', f1_accuracy_results[0]['parameters']['f1'])
         if len(accuracy_results):
-            client.log_metric(artifact_run_id, 'accuracy_score', accuracy_results[0]['parameters']['value'])
+            client.log_metric(artifact_run_id, 'accuracy_score', accuracy_results[0]['parameters']['accuracy'])
             promote_candidate_model = accuracy_results[0]['status'] == 'SUCCESS' or not preexisting_base_model_found
 
             # Promote the best model
@@ -287,7 +309,7 @@ def predict(img, model_name, model_stage):
         traceback.print_exc()
         return None
 
-    labels = ['airplane', 'automobile', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse', 'ship', 'truck']
+    labels = ['no', 'yes']
 
     img = img.resize((32, 32))
     img = img_to_array(img)
