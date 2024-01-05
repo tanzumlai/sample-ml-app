@@ -1,6 +1,7 @@
 # ML Sample App Accelerator
 
 This is a sample app which generates a Convolutional Neural Network using Tensorflow 2.0/Keras.
+![](sample-cnn-demo.jpg?raw=true)
 
 * Install App Accelerator: (see https://docs.vmware.com/en/Tanzu-Application-Platform/1.0/tap/GUID-cert-mgr-contour-fcd-install-cert-mgr.html)
 ```
