@@ -12,7 +12,8 @@ entry_points:
         model-flavor: {default: "tensorflow"}
         model-stage: {default: "None"}
         epochs: {type: float, default: 10}
-    command: 'python train_model.py "{dataset-name}" "{model-name}" "{model-flavor}" "{model-stage}" {epochs}'
+        ray-address: {default: ""}
+    command: 'python train_model.py "{dataset-name}" "{model-name}" "{model-flavor}" "{model-stage}" {epochs} "{ray-address}"'
   evaluate_model:
     parameters:
         dataset-name: {default: "cifar10"}
