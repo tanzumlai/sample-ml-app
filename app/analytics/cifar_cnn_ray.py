@@ -12,9 +12,9 @@ import ray
 
 # ## Initialize Ray environment
 def initialize_environment(ray_address):
-    logging.info(f"Initializing Ray environment - host={ray_address}...")
+    logging.info(f"Initializing Ray environment (if not already initialized) - host={ray_address}, working directory={os.getcwd()}...")
     ray.init(address=ray_address,
-             runtime_env={'working_dir': ".", 'pip': "requirements.txt",
+             runtime_env={'working_dir': os.getcwd(), 'pip': "requirements.txt",
                           'env_vars': dict(os.environ),
                           'excludes': ['*.jar', '.git*/', 'jupyter/']}) if ray_address else ray.init() if not ray.is_initialized() else True
 
