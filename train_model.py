@@ -9,7 +9,8 @@ data = hkl.load(dataset_path)
 " Launch a remote Ray task if a Ray address parameter was passed; 
 " else, execute the task locally
 """
-if len(sys.argv[6]) > 0:
+if len(sys.argv[6]) > 2:
+    logging.info(f"Ray training environment param found...{sys.argv[6]}")
     cifar_cnn_ray.initialize_environment(sys.argv[6])
     cifar_cnn_ray.train_model.remote(
         model_name=sys.argv[2],
