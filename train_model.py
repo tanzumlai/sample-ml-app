@@ -1,6 +1,7 @@
 from app.analytics import cifar_cnn, cifar_cnn_ray
 import hickle as hkl
 import sys
+import logging
 
 dataset_path = cifar_cnn.download_dataset(artifact=sys.argv[1])
 data = hkl.load(dataset_path)
