@@ -15,14 +15,14 @@ accelerator:
   - "tensorflow"
   - "deeplearning"
   options:
-    - name: Manual
+    - name: manual
       inputType: radio
       display: true
       choices:
         - text: 'View guidance manual: https://raw.githubusercontent.com/agapebondservant/accelerator-docs/main/docs/sample-mlflow-project.pdf'
           value: doc
       defaultValue: doc
-    - name: Jupyter
+    - name: jupyter
       inputType: radio
       display: true
       choices:
