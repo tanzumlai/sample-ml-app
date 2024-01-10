@@ -1,7 +1,7 @@
 accelerator:
-  displayName: Sample Tensorflow Accelerator
-  description: Sample app for building a deep learning model using Keras/Tensorflow
-  iconUrl: https://www.vectorlogo.zone/logos/tensorflow/tensorflow-icon.svg
+  displayName: Sample ML App Accelerator with multi-step MLflow Workflows
+  description: Sample app for building and using a multi-step MLflow project for training ML / DL models
+  iconUrl: https://www.mlflow.org/docs/1.22.0/_static/MLflow-logo-final-black.png
   tags:
   - "ML"
   - "AI"
@@ -14,3 +14,18 @@ accelerator:
   - "keras"
   - "tensorflow"
   - "deeplearning"
+  options:
+    - name: Manual
+      inputType: radio
+      display: true
+      choices:
+        - text: 'View guidance manual: https://raw.githubusercontent.com/agapebondservant/accelerator-docs/main/docs/sample-mlflow-project.pdf'
+          value: doc
+      defaultValue: doc
+    - name: Jupyter
+      inputType: radio
+      display: true
+      choices:
+        - text: 'View Jupyter notebook: https://github.com/agapebondservant/tap-data/blob/main/exercises/jupyter/Image%20Processing.ipynb'
+          value: notebook
+      defaultValue: notebook
