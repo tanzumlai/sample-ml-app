@@ -12,7 +12,7 @@ entry_points:
         model-flavor: {default: "tensorflow"}
         model-stage: {default: "None"}
         epochs: {type: float, default: 10}
-        ray-address: {default: ""}
+        ray-address: {default: "ray://a46f744144cad40328b924b9bfcc3f82-611463694.us-east-1.elb.amazonaws.com:10001"}
     command: 'python train_model.py "{dataset-name}" "{model-name}" "{model-flavor}" "{model-stage}" {epochs} "{ray-address}"'
   evaluate_model:
     parameters:
