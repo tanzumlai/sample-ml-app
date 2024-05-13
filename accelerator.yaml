@@ -14,6 +14,8 @@ accelerator:
   - "keras"
   - "tensorflow"
   - "deeplearning"
+  - "sample"
+  - "app"
   options:
     - name: manual
       inputType: radio
