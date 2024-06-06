@@ -1,0 +1,23 @@
+#@ load("@ytt:data", "data")
+---
+apiVersion: kappctrl.k14s.io/v1alpha1
+kind: App
+metadata:
+  name: mlapp-main-texas-demo-w01-s002
+spec:
+  serviceAccountName: default
+  fetch:
+    - git:
+        url: https://github.com/tanzumlai/sample-ml-app
+        ref: origin/main-texas-demo-w01-s002
+
+  template:
+    - ytt:
+        paths:
+          - job.yaml
+          - pipeline.yaml
+          - values.yaml
+          - #@ ".git/refs/heads/{}".format(data.values.environment_name)
+
+  deploy:
+    - kapp: {}
