@@ -1,0 +1,10 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: sample-cnn-app
+  annotations:
+    github.com/project-slug: tanzumlai/sample-ml-app
+spec:
+  type: other
+  lifecycle: unknown
+  owner: tanzu-tech-marketing
